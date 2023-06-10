@@ -2,23 +2,8 @@
 
 const Hapi = require('@hapi/hapi');
 
-const routes = require('./routes/routes');
-
-// const server = Hapi.server({
-//   port: 3000,
-//   host: 'localhost',
-// });
-
-// server.route(routes);
-
-// async function startServer() {
-//   try {
-//     await server.start();
-//     console.log('Server running at: ', server.info.uri);
-//   } catch(err) {
-//     console.log('Error starting server: ', err);
-//   }
-// }
+const transactionRoutes = require('./routes/transactionRoutes');
+const productRoutes = require('./routes/productRoutes');
 const init = async () => {
 
   const server = Hapi.server({
@@ -26,7 +11,8 @@ const init = async () => {
       host: 'localhost'
   });
 
-  server.route(routes);
+  server.route(productRoutes);
+  server.route(transactionRoutes);
 
   await server.start();
   console.log('Server running on %s', server.info.uri);
@@ -39,5 +25,3 @@ process.on('unhandledRejection', (err) => {
 });
 
 init();
-
-// startServer();
