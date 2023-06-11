@@ -26,4 +26,9 @@ module.exports = [
     path: '/updateProduct/{id}',
     handler: product.updateProduct
   },
+  {
+    method: 'DELETE',
+    path: '/deleteProduct/{id}',
+    handler: product.deleteProduct
+  },
 ];

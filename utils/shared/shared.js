@@ -33,7 +33,7 @@ function removeDuplicateSku(products) {
 
 async function getSku(sku) {
   try { 
-    const query = 'SELECT * FROM product WHERE sku = $1';
+    const query = 'SELECT id, name, sku, price, image, description, stock FROM product WHERE sku = $1';
     const result = await db.query(query, [sku]);
     return result.rows;
   } catch(err) {
@@ -43,7 +43,7 @@ async function getSku(sku) {
 
 async function getProductId(id) {
   try { 
-    const query = 'SELECT * FROM product WHERE id = $1';
+    const query = 'SELECT id FROM product WHERE id = $1';
     const result = await db.query(query, [id]);
     return result.rows;
   } catch(err) {
@@ -53,7 +53,7 @@ async function getProductId(id) {
 
 async function getTransactionId(id) {
   try { 
-    const query = 'SELECT * FROM adjustment_transaction WHERE id = $1';
+    const query = 'SELECT id FROM adjustment_transaction WHERE id = $1';
     const result = await db.query(query, [id]);
     return result.rows;
   } catch(err) {
@@ -64,7 +64,7 @@ async function getTransactionId(id) {
 async function getAllProduct(page, limit) {
   const offset = (page - 1) * limit;
   try { 
-    const query = 'SELECT * FROM product LIMIT $1 OFFSET $2';
+    const query = 'SELECT name, sku, image, price, description, stock FROM product ORDER BY id ASC LIMIT $1 OFFSET $2';
     const result = await db.query(query, [limit, offset]);
     return result.rows;
   } catch(err) {
@@ -76,7 +76,7 @@ async function getAllProduct(page, limit) {
 async function getAllTransaction(page, limit) {
   const offset = (page - 1) * limit;
   try { 
-    const query = 'SELECT * FROM adjustment_transaction LIMIT $1 OFFSET $2';
+    const query = 'SELECT sku, qty, amount FROM adjustment_transaction ORDER BY id ASC LIMIT $1 OFFSET $2';
     const result = await db.query(query, [limit, offset]);
     return result.rows;
   } catch(err) {
@@ -87,7 +87,7 @@ async function getAllTransaction(page, limit) {
 
 async function getSkuTransaction(sku) {
   try { 
-    const query = 'SELECT * FROM adjustment_transaction WHERE sku = $1';
+    const query = 'SELECT id, sku, qty, amount FROM adjustment_transaction WHERE sku = $1';
     const result = await db.query(query, [sku]);
     return result.rows;
   } catch(err) {
