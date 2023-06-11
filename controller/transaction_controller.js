@@ -1,8 +1,16 @@
 const db = require('../database/db');
 const shared = require('../utils/shared/shared');
 
+const {transactionSchema, pagination, skuValidation, idValidation} = require('../utils/Validation/validations');
+
 async function createTransaction(request, h) {
   const { sku, qty } = request.payload;
+
+  const { error } = transactionSchema.validate({ sku, qty });
+  if (error) {
+    return h.response(error.details[0].message).code(400);
+  }
+
   try {
     const stockQuery = `SELECT stock, price FROM product WHERE sku = $1`;
     const stock = await db.query(stockQuery, [sku]);
@@ -31,6 +39,12 @@ async function createTransaction(request, h) {
 
 async function getList(request, h) {
   const { page, limit } = request.query;
+
+  const { error } = pagination.validate({ page, limit });
+  if (error) {
+    return h.response(error.details[0].message).code(400);
+  }
+
   try {
     const data = await shared.getAllTransaction(page, limit);
     const response = {
@@ -46,6 +60,12 @@ async function getList(request, h) {
 
 async function getDetailTransaction(request, h) {
   const {sku} = request.query;
+
+  const { error } = skuValidation.validate({ sku });
+  if (error) {
+    return h.response(error.details[0].message).code(400);
+  }
+
   try {
     const data = await shared.getSkuTransaction(sku);
     if (data.length > 0) {
@@ -67,6 +87,15 @@ async function getDetailTransaction(request, h) {
 async function updateTransaction(request, h) {
   const {id} = request.params;
   const {sku, qty} = request.payload;
+
+  const { error: idError } = idValidation.validate({ id });
+  if (idError) {
+    return h.response(idError.details[0].message).code(400);
+  }
+  const { error: productError } = transactionSchema.validate({ sku, qty });
+  if (productError) {
+    return h.response(productError.details[0].message).code(400);
+  }
 
   try {
     const getId = await shared.getTransactionId(id);
@@ -93,6 +122,11 @@ async function updateTransaction(request, h) {
 
 async function deleteTransaction(request, h) {
   const {id} = request.params;
+
+  const { error } = idValidation.validate({ id });
+  if (error) {
+    return h.response(error.details[0].message).code(400);
+  }
 
   try {
     const getId = await shared.getTransactionId(id);

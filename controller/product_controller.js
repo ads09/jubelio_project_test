@@ -1,6 +1,8 @@
 const db = require('../database/db');
 const shared = require('../utils/shared/shared');
 
+const {productSchema, pagination, skuValidation, idValidation} = require('../utils/Validation/validations');
+
 async function getWoocomerceHandler(request, h) {
   try {
     const getData = await shared.getWoocomerceData();
@@ -43,6 +45,12 @@ async function getWoocomerceHandler(request, h) {
 
 async function getList(request, h) {
   const { page, limit } = request.query;
+
+  const { error } = pagination.validate({ page, limit });
+  if (error) {
+    return h.response(error.details[0].message).code(400);
+  }
+
   try {
     const data = await shared.getAllProduct(page, limit);
     const response = {
@@ -58,6 +66,12 @@ async function getList(request, h) {
 
 async function getDetailProduct(request, h) {
   const {sku} = request.query;
+
+  const { error } = skuValidation.validate({ sku });
+  if (error) {
+    return h.response(error.details[0].message).code(400);
+  }
+
   try {
     const data = await shared.getSku(sku);
     const response = {
@@ -73,6 +87,11 @@ async function getDetailProduct(request, h) {
 
 async function createProduct(request, h) {
   const {name, sku, image, price, description, stock} = request.payload;
+
+  const { error } = productSchema.validate({ name, sku, image, price, description, stock });
+  if (error) {
+    return h.response(error.details[0].message).code(400);
+  }
 
   try {
     const getSku = await shared.getSku(sku);
@@ -101,6 +120,15 @@ async function updateProduct(request, h) {
   const {id} = request.params;
   const {name, sku, image, price, description, stock} = request.payload;
 
+  const { error: idError } = idValidation.validate({ id });
+  if (idError) {
+    return h.response(idError.details[0].message).code(400);
+  }
+  const { error: productError } = productSchema.validate({ name, sku, image, price, description, stock });
+  if (productError) {
+    return h.response(productError.details[0].message).code(400);
+  }
+
   try {
     const getId = await shared.getProductId(id);
 
@@ -126,6 +154,11 @@ async function updateProduct(request, h) {
 
 async function deleteProduct(request, h) {
   const {id} = request.params;
+
+  const { error } = idValidation.validate({ id });
+  if (error) {
+    return h.response(error.details[0].message).code(400);
+  }
 
   try {
     const getId = await shared.getProductId(id);
